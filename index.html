@@ -147,10 +147,11 @@ code{background:#f3f4f6;padding:2px 8px;border-radius:5px;font-size:.82rem;font-
 <div id="sl-screen" class="screen">
   <div class="lcard">
     <h2>Student Login</h2>
-    <p class="sub">Enter your name and the password given by your instructor.</p>
+    <p class="sub">Enter your name, select your test set, and enter the password from your instructor.</p>
     <div id="sl-err" class="alert ae" style="display:none"></div>
     <div class="fg"><label>Full Name</label><input type="text" class="fc" id="sl-name" placeholder="Your full name" onkeydown="if(event.key==='Enter')sLogin()"></div>
-    <div class="fg"><label>Password</label><input type="password" class="fc" id="sl-pw" placeholder="Your test password" onkeydown="if(event.key==='Enter')sLogin()"></div>
+    <div class="fg"><label>Test Set</label><select class="fc" id="sl-set"><option value="">-- Select Test Set --</option><option value="A">Set A</option><option value="B">Set B</option><option value="C">Set C</option></select></div>
+    <div class="fg"><label>Password</label><input type="password" class="fc" id="sl-pw" placeholder="Test password" onkeydown="if(event.key==='Enter')sLogin()"></div>
     <button class="btn bp" style="width:100%" onclick="sLogin()">Continue &#8594;</button>
     <a class="bkl" onclick="go('welcome-screen')">&#8592; Back</a>
   </div>
@@ -1267,18 +1268,18 @@ function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remo
 function closeOv(id){document.getElementById(id).classList.remove('on');}
 
 function sLogin(){
-  const name=document.getElementById('sl-name').value.trim().toLowerCase();
+  const name=document.getElementById('sl-name').value.trim();
+  const set=document.getElementById('sl-set').value;
   const pw=document.getElementById('sl-pw').value.trim();
   document.getElementById('sl-err').style.display='none';
-  if(!name||!pw){showE('sl-err','Please enter name and password.');return;}
-  const s=D.students.find(x=>x.name.toLowerCase()===name&&x.pw===pw);
-  if(!s){showE('sl-err','Name or password incorrect. Check with your instructor.');return;}
-  if(s.status==='completed'){showE('sl-err','You have already completed this test.');return;}
-  CUR=JSON.parse(JSON.stringify(s));
-  document.getElementById('inf-name').value=s.name;
-  document.getElementById('inf-email').value=s.email||'';
+  if(!name||!set||!pw){showE('sl-err','Please fill in all fields.');return;}
+  const SET_PW={A:'Tr@8mK#2vL',B:'Qx9!pW$5nR',C:'Jy6&hN@3cF'};
+  if(pw!==SET_PW[set]){showE('sl-err','Incorrect password. Check with your instructor.');return;}
+  CUR={id:'s'+Date.now(),name:name,email:'',set:set,status:'pending',created:new Date().toISOString()};
+  document.getElementById('inf-name').value=name;
+  document.getElementById('inf-email').value='';
   document.getElementById('inf-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('inf-set').textContent='Test Set '+s.set;
+  document.getElementById('inf-set').textContent='Test Set '+set;
   go('info-screen');
 }
 function aLogin(){
